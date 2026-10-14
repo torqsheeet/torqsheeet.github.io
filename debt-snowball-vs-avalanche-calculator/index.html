@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debt snowball vs avalanche calculator (free, in your browser)</title>
+<meta name="description" content="Enter your debts and an extra monthly payment. See months to debt-free and total interest for the snowball, the avalanche and minimum payments only, side by side. Runs in your browser, no sign-up.">
+<link rel="canonical" href="https://torqsheeet.github.io/debt-snowball-vs-avalanche-calculator/">
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:760px;margin:0 auto;padding:24px 18px 60px;line-height:1.55;color:#1d2a26;background:#fbfaf6}
+h1{font-size:1.8rem;line-height:1.2;margin:.2em 0 .4em} h2{font-size:1.25rem;margin-top:2em}
+table{border-collapse:collapse;width:100%;margin:1em 0} th,td{border-bottom:1px solid #d9d6cc;padding:6px 6px;text-align:left} th{background:#e8efe9}
+input{font-size:1rem;padding:5px 6px;width:100%;box-sizing:border-box} button{font-size:1rem;padding:6px 12px}
+.box{background:#fff;border:1px solid #d9d6cc;border-radius:8px;padding:16px;margin:1.2em 0}
+small,.note{color:#5b6660} a{color:#1f6b4f} td.num,th.num{text-align:right}
+</style>
+</head>
+<body>
+<p class="note"><a href="/">Torqsheet</a> &middot; budgeting notes</p>
+<h1>Debt snowball vs avalanche calculator</h1>
+<p>Two common ways to pay off several debts. Both pay every minimum each month and put everything
+extra on one target debt; when a debt is paid off, its minimum rolls over onto the next target.
+The <b>snowball</b> targets the smallest balance first. The <b>avalanche</b> targets the highest
+interest rate first. Enter your own numbers to see what the difference is for you.</p>
+
+<div class="box">
+<table id="debts">
+<tr><th>Debt</th><th class="num">Balance</th><th class="num">APR %</th><th class="num">Minimum / month</th></tr>
+</table>
+<button id="add" type="button">Add a debt</button>
+<p><label for="extra">Extra paid each month on top of the minimums:</label>
+<input id="extra" type="number" min="0" step="1" value="200" style="width:9em"></p>
+<button id="go" type="button">Compare</button>
+<div id="out"></div>
+<small>Runs in your browser; nothing is sent anywhere. The example rows are made up: replace them with yours.</small>
+</div>
+
+<h2>How the numbers are worked out</h2>
+<p>Month by month: interest is added at APR / 12 on each balance, every minimum is paid (or the
+remaining balance, if smaller), then the extra plus any minimums freed by paid-off debts goes to the
+target debt, and if the target is cleared the rest moves to the next one. "Minimums only" pays the
+minimums and nothing else. Real lenders compute interest daily and minimums often shrink as
+balances fall, so treat the results as an estimate for comparing the two methods, not as a payoff
+quote. This is general budgeting information, not financial advice.</p>
+
+<h2>Which one to pick</h2>
+<p>On interest alone the avalanche usually costs less than the snowball (or the same), and the gap is
+often small when rates are close. The snowball clears whole debts sooner, which some people find easier to stick
+with. The calculator shows both, so you can see what that trade costs in your case.</p>
+
+<h2>Spreadsheet version</h2>
+<p>Torqsheet sells a <a href="https://torqsheet.gumroad.com/l/debt-payoff-tracker?utm_source=torqsheet-site&amp;utm_campaign=debt-calc">Debt
+Payoff Tracker</a> (USD 10.99, Excel) that runs the same comparison with a month-by-month schedule
+you can keep updating. For a monthly budget there is a free
+<a href="https://torqsheet.gumroad.com/l/one-month-budget-starter?utm_source=torqsheet-site&amp;utm_campaign=debt-calc">One Month Budget Starter</a>
+(EUR 0, .xlsx). Disclosure: Torqsheet makes and sells these; this calculator is free either way.</p>
+
+<p class="note">Spotted a mistake? Open an issue on
+<a href="https://github.com/torqsheeet/torqsheeet.github.io/issues">GitHub</a>.</p>
+
+<script>
+var examples = [['Card A', 3200, 22.9, 96], ['Card B', 850, 19.9, 30], ['Car loan', 7400, 6.5, 210], ['Store card', 420, 26.9, 25]];
+var tbl = document.getElementById('debts');
+function addRow(d) {
+  d = d || ['', '', '', ''];
+  var tr = tbl.insertRow(-1);
+  for (var i = 0; i < 4; i++) {
+    var inp = document.createElement('input');
+    if (i > 0) { inp.type = 'number'; inp.min = '0'; inp.step = 'any'; }
+    inp.value = d[i];
+    tr.insertCell(-1).appendChild(inp);
+  }
+}
+examples.forEach(addRow);
+document.getElementById('add').onclick = function () { addRow(); };
+
+function simulate(debts, extra, order) {
+  var b = debts.map(function (d) { return d.bal; }), interest = 0, month = 0;
+  var left = function () { return b.some(function (x) { return x > 0.005; }); };
+  while (left()) {
+    month++;
+    if (month > 1200) return null;
+    var pool = extra;
+    for (var i = 0; i < b.length; i++) {
+      if (b[i] <= 0.005) { if (order) pool += debts[i].min; continue; }
+      var it = Math.round(b[i] * debts[i].apr / 1200 * 100) / 100;
+      b[i] += it; interest += it;
+      var pay = Math.min(debts[i].min, b[i]);
+      b[i] -= pay;
+      if (order) pool += debts[i].min - pay;
+    }
+    if (order) {
+      for (var k = 0; k < order.length && pool > 0.005; k++) {
+        var j = order[k];
+        if (b[j] <= 0.005) continue;
+        var p = Math.min(pool, b[j]);
+        b[j] -= p; pool -= p;
+      }
+    }
+  }
+  return { months: month, interest: interest };
+}
+
+function fmt(n) { return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function span(m) { var y = Math.floor(m / 12), r = m % 12; return m + ' months (' + (y ? y + ' y ' : '') + r + ' m)'; }
+
+document.getElementById('go').onclick = function () {
+  var debts = [];
+  for (var r = 1; r < tbl.rows.length; r++) {
+    var c = tbl.rows[r].querySelectorAll('input');
+    var bal = parseFloat(c[1].value), apr = parseFloat(c[2].value), min = parseFloat(c[3].value);
+    if (!(bal > 0)) continue;
+    debts.push({ name: c[0].value || ('Debt ' + r), bal: bal, apr: apr > 0 ? apr : 0, min: min > 0 ? min : 0 });
+  }
+  var extra = Math.max(0, parseFloat(document.getElementById('extra').value) || 0);
+  var out = document.getElementById('out');
+  if (!debts.length) { out.textContent = 'Enter at least one balance.'; return; }
+  var idx = debts.map(function (_, i) { return i; });
+  var snow = idx.slice().sort(function (a, c) { return debts[a].bal - debts[c].bal || debts[c].apr - debts[a].apr; });
+  var aval = idx.slice().sort(function (a, c) { return debts[c].apr - debts[a].apr || debts[a].bal - debts[c].bal; });
+  var rows = [['Snowball (smallest balance first)', simulate(debts, extra, snow), snow],
+              ['Avalanche (highest rate first)', simulate(debts, extra, aval), aval],
+              ['Minimums only', simulate(debts, 0, null), null]];
+  var h = '<table><tr><th>Method</th><th class="num">Debt-free in</th><th class="num">Total interest</th></tr>';
+  rows.forEach(function (x) {
+    h += '<tr><td>' + x[0] + '</td>' + (x[1] ? '<td class="num">' + span(x[1].months) + '</td><td class="num">' + fmt(x[1].interest) + '</td>'
+      : '<td class="num" colspan="2">not within 100 years (a minimum may not cover its interest)</td>') + '</tr>';
+  });
+  h += '</table>';
+  var order = function (o) { return o.map(function (i) { return debts[i].name.replace(/[<>&]/g, ''); }).join(' → '); };
+  h += '<p><small>Snowball order: ' + order(snow) + '<br>Avalanche order: ' + order(aval) + '</small></p>';
+  if (rows[0][1] && rows[1][1]) {
+    var gap = rows[0][1].interest - rows[1][1].interest;
+    h += '<p><b>' + (Math.abs(gap) < 0.005 ? 'No interest difference between the two here.' : (gap > 0 ? 'Avalanche' : 'Snowball') + ' costs ' + fmt(Math.abs(gap)) + ' less in interest.') + '</b></p>';
+  }
+  out.innerHTML = h;
+};
+document.getElementById('go').click();
+</script>
+</body>
+</html>
