@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Three-paycheck months in 2027 (biweekly pay calendar)</title>
+<meta name="description" content="Which months of 2027 have three biweekly paychecks? A table for every possible first payday, a checker for your own pay date, and why a January 1 payday means 27 paychecks in 2027.">
+<link rel="canonical" href="https://torqsheeet.github.io/three-paycheck-months-2027/">
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:720px;margin:0 auto;padding:24px 18px 60px;line-height:1.55;color:#1d2a26;background:#fbfaf6}
+h1{font-size:1.8rem;line-height:1.2;margin:.2em 0 .4em} h2{font-size:1.25rem;margin-top:2em}
+table{border-collapse:collapse;width:100%;margin:1em 0} th,td{border-bottom:1px solid #d9d6cc;padding:7px 8px;text-align:left} th{background:#e8efe9}
+.box{background:#fff;border:1px solid #d9d6cc;border-radius:8px;padding:16px;margin:1.2em 0}
+input,button{font-size:1rem;padding:6px 10px} #out{margin-top:12px;font-weight:600}
+small,.note{color:#5b6660} a{color:#1f6b4f}
+</style>
+</head>
+<body>
+<p class="note"><a href="/">Torqsheet</a> &middot; budgeting notes</p>
+<h1>Three-paycheck months in 2027</h1>
+<p>If you are paid every two weeks, you get 26 paychecks a year, but most budgets are built on 12
+months. That leaves two months (sometimes three) where a third paycheck lands. Knowing which
+ones in advance lets you budget each month on two paychecks and decide now what the extra ones
+are for.</p>
+
+<h2>Check your own pay date</h2>
+<div class="box">
+<label for="pd">Any payday you know (past or future):</label><br>
+<input type="date" id="pd" value="2027-01-08"> <button id="go">Show 2027</button>
+<div id="out"></div>
+<small>Runs in your browser; nothing is sent anywhere.</small>
+</div>
+
+<h2>Every biweekly schedule in 2027</h2>
+<p>Find your first payday of January 2027. The schedule repeats every 14 days, so these 14 rows
+cover every biweekly pattern.</p>
+<table>
+<tr><th>First payday in 2027</th><th>Three-paycheck months</th><th>Paychecks in 2027</th></tr>
+<tr><td>Fri 01 Jan</td><td>January, July and December</td><td>27</td></tr>
+<tr><td>Sat 02 Jan</td><td>January and July</td><td>26</td></tr>
+<tr><td>Sun 03 Jan</td><td>January and August</td><td>26</td></tr>
+<tr><td>Mon 04 Jan</td><td>March and August</td><td>26</td></tr>
+<tr><td>Tue 05 Jan</td><td>March and August</td><td>26</td></tr>
+<tr><td>Wed 06 Jan</td><td>March and September</td><td>26</td></tr>
+<tr><td>Thu 07 Jan</td><td>April and September</td><td>26</td></tr>
+<tr><td>Fri 08 Jan</td><td>April and October</td><td>26</td></tr>
+<tr><td>Sat 09 Jan</td><td>May and October</td><td>26</td></tr>
+<tr><td>Sun 10 Jan</td><td>May and October</td><td>26</td></tr>
+<tr><td>Mon 11 Jan</td><td>May and November</td><td>26</td></tr>
+<tr><td>Tue 12 Jan</td><td>June and November</td><td>26</td></tr>
+<tr><td>Wed 13 Jan</td><td>June and December</td><td>26</td></tr>
+<tr><td>Thu 14 Jan</td><td>July and December</td><td>26</td></tr>
+</table>
+
+<h2>The 27-paycheck year</h2>
+<p>January 1, 2027 is a Friday. If your Friday paydays fall on January 1, the 27th one lands on
+December 31, so 2027 holds 27 paychecks instead of 26. If your pay is a fixed annual salary split
+into 26 paychecks, ask your employer how they handle the extra one. January 1 is also a public
+holiday in many countries, and employers often pay on the working day before, which would move
+that paycheck into December 2026. The table uses the plain 14-day dates and does not shift for
+holidays or weekends.</p>
+
+<h2>What to do with a third paycheck</h2>
+<p>A common approach: build the monthly budget on two paychecks, so fixed bills never depend on
+the third. Then give each extra paycheck a job before it arrives, written into your budget: a
+sinking fund (holidays, car repairs, annual subscriptions), an extra debt payment, or savings.
+This is general budgeting information, not financial advice.</p>
+
+<h2>Free spreadsheet</h2>
+<p>To plan a single month as budget against actual, there is a free Excel sheet:
+<a href="https://torqsheet.gumroad.com/l/one-month-budget-starter?utm_source=torqsheet-site&amp;utm_campaign=3paycheck-2027">One Month Budget Starter</a>
+(EUR 0, .xlsx, no macros). If you want to plan by paycheck rather than by month, Torqsheet also
+sells a <a href="https://torqsheet.gumroad.com/l/paycheck-budget-planner?utm_source=torqsheet-site&amp;utm_campaign=3paycheck-2027">Paycheck Budget
+Planner</a> (USD 10.99, Excel). Disclosure: Torqsheet makes and sells these; this page is free
+either way.</p>
+
+<p class="note">Dates computed by script for the 2027 calendar year. Spotted a mistake? Open an issue on
+<a href="https://github.com/torqsheeet/torqsheeet.github.io/issues">GitHub</a>.</p>
+
+<script>
+document.getElementById('go').onclick = function () {
+  var v = document.getElementById('pd').value; if (!v) return;
+  var p = v.split('-'), day = 864e5, step = 14 * day;
+  var t = Date.UTC(+p[0], +p[1] - 1, +p[2]);
+  var start = Date.UTC(2027, 0, 1), end = Date.UTC(2027, 11, 31);
+  var first = t + Math.ceil((start - t) / step) * step, c = {}, n = 0;
+  for (var x = first; x <= end; x += step) { var m = new Date(x).getUTCMonth(); c[m] = (c[m] || 0) + 1; n++; }
+  var names = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var three = []; for (var i = 0; i < 12; i++) if (c[i] === 3) three.push(names[i]);
+  document.getElementById('out').textContent = 'First 2027 payday: ' + new Date(first).toISOString().slice(0, 10) +
+    '. Three-paycheck months: ' + three.join(', ') + '. Paychecks in 2027: ' + n + '.';
+};
+document.getElementById('go').click();
+</script>
+</body>
+</html>
