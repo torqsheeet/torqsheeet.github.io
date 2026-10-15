@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>27 paychecks in 2027? Who gets 27 biweekly (or 53 weekly) pay periods</title>
+<meta name="description" content="2027 starts and ends on a Friday. Which pay schedules get 27 biweekly paychecks or 53 weekly ones in 2027, the January 1 holiday catch, and a calculator for what it does to each paycheck.">
+<link rel="canonical" href="https://torqsheeet.github.io/27-paychecks-2027/">
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:720px;margin:0 auto;padding:24px 18px 60px;line-height:1.55;color:#1d2a26;background:#fbfaf6}
+h1{font-size:1.8rem;line-height:1.2;margin:.2em 0 .4em} h2{font-size:1.25rem;margin-top:2em}
+table{border-collapse:collapse;width:100%;margin:1em 0} th,td{border-bottom:1px solid #d9d6cc;padding:7px 8px;text-align:left} th{background:#e8efe9}
+.box{background:#fff;border:1px solid #d9d6cc;border-radius:8px;padding:16px;margin:1.2em 0}
+input,button{font-size:1rem;padding:6px 10px} #out{margin-top:12px}
+small,.note{color:#5b6660} a{color:#1f6b4f}
+</style>
+</head>
+<body>
+<p class="note"><a href="/">Torqsheet</a> &middot; budgeting notes</p>
+<h1>27 paychecks in 2027?</h1>
+<p><strong>Short answer:</strong> 2027 has 365 days, which is 52 weeks and one day, and that extra
+day is a Friday: the year starts on Friday January 1 and ends on Friday December 31. So:</p>
+<table>
+<tr><th>Pay schedule</th><th>Paydays in 2027</th></tr>
+<tr><td>Every two weeks, on Fridays, with a payday on Fri 1 Jan 2027</td><td><strong>27</strong> (the last one on Fri 31 Dec)</td></tr>
+<tr><td>Every two weeks, any other pattern (including the other Friday pattern, first payday Fri 8 Jan)</td><td>26</td></tr>
+<tr><td>Weekly, on Fridays</td><td><strong>53</strong></td></tr>
+<tr><td>Weekly, on any other weekday</td><td>52</td></tr>
+<tr><td>Twice a month (for example the 15th and the last day)</td><td>24, always</td></tr>
+<tr><td>Monthly</td><td>12, always</td></tr>
+</table>
+<p>Not sure which Friday pattern you are on? Count 14 days at a time from any payday you know, or
+use the checker on the <a href="/three-paycheck-months-2027/">three-paycheck months in 2027</a>
+page, which lists every biweekly pattern.</p>
+
+<h2>The January 1 catch</h2>
+<p>January 1 is New Year's Day, a bank holiday in the US and many other countries. Many payrolls
+pay on the last working day before a holiday payday, which would be Thursday 31 December 2026.
+If yours does, that paycheck lands in 2026, and 2027 has 26 paychecks after all (2026 then has
+27). Others pay the next working day, which keeps it in 2027. Your payroll department or pay
+calendar is the only reliable answer for your job; the counts above use the plain calendar dates.</p>
+
+<h2>What a 27th paycheck does to each paycheck</h2>
+<p>If you are paid by the hour, a 27th payday just means another period of hours paid. For a fixed
+annual salary, employers generally take one of two approaches, and it is worth asking which:</p>
+<ul>
+<li><strong>Salary divided by 27:</strong> your yearly pay stays the same, so every paycheck in
+2027 is a little smaller than in a 26-paycheck year.</li>
+<li><strong>Same paycheck as usual, 27 times:</strong> each paycheck stays the same and the year
+pays one extra paycheck.</li>
+</ul>
+<div class="box">
+<label for="sal">Annual salary:</label>
+<input type="number" id="sal" value="52000" min="0" step="100">
+<button id="go">Compare</button>
+<div id="out"></div>
+<small>Gross pay before tax and deductions. Runs in your browser; nothing is sent anywhere.</small>
+</div>
+<p>Also check anything taken as a fixed amount per paycheck: a benefit premium or a retirement
+contribution set per paycheck to reach a yearly target is taken 27 times instead of 26, so the
+yearly total comes out about 4% higher than planned. If you set those amounts yourself, it may be
+worth recalculating them for 2027.</p>
+
+<h2>Budgeting a 27-paycheck year</h2>
+<p>On the Friday 1 January pattern, January, July and December each get three paychecks
+(1, 15, 29 Jan; 2, 16, 30 Jul; 3, 17, 31 Dec). A common approach is to budget every month on two
+paychecks so fixed bills never depend on a third, and give each third paycheck a job in advance:
+a sinking fund, an extra debt payment, or savings. If your paychecks get smaller because the
+salary is divided by 27, the two-paycheck months get slightly tighter, so build the budget on the
+2027 paycheck amount, not the 2026 one. This is general budgeting information, not financial,
+tax or payroll advice.</p>
+
+<h2>Free spreadsheet</h2>
+<p>To plan a month as budget against actual, there is a free Excel sheet:
+<a href="https://torqsheet.gumroad.com/l/one-month-budget-starter?utm_source=torqsheet-site&amp;utm_campaign=27-paychecks-2027">One Month Budget Starter</a>
+(EUR 0, .xlsx, no macros). If you want to plan by paycheck rather than by month, Torqsheet also
+sells a <a href="https://torqsheet.gumroad.com/l/paycheck-budget-planner?utm_source=torqsheet-site&amp;utm_campaign=27-paychecks-2027">Paycheck Budget
+Planner</a> (USD 10.99, Excel). Disclosure: Torqsheet makes and sells these; this page is free
+either way.</p>
+
+<p class="note">Day counts computed by script for the 2027 calendar year. Spotted a mistake? Open an issue on
+<a href="https://github.com/torqsheeet/torqsheeet.github.io/issues">GitHub</a>.</p>
+
+<script>
+function money(x) { return x.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+document.getElementById('go').onclick = function () {
+  var s = parseFloat(document.getElementById('sal').value);
+  var out = document.getElementById('out');
+  if (!(s > 0)) { out.textContent = 'Enter an annual salary above zero.'; return; }
+  var p26 = s / 26, p27 = s / 27, w52 = s / 52, w53 = s / 53;
+  out.innerHTML =
+    '<table>' +
+    '<tr><th></th><th>Each paycheck</th><th>Year total</th></tr>' +
+    '<tr><td>Usual year, 26 biweekly paychecks</td><td>' + money(p26) + '</td><td>' + money(s) + '</td></tr>' +
+    '<tr><td>2027, salary divided by 27</td><td>' + money(p27) + ' (' + money(p26 - p27) + ' less)</td><td>' + money(s) + '</td></tr>' +
+    '<tr><td>2027, usual paycheck 27 times</td><td>' + money(p26) + '</td><td>' + money(p26 * 27) + '</td></tr>' +
+    '<tr><td>Weekly: 52 vs 53 paychecks (salary divided)</td><td>' + money(w52) + ' vs ' + money(w53) + '</td><td>' + money(s) + '</td></tr>' +
+    '</table>';
+};
+document.getElementById('go').click();
+</script>
+</body>
+</html>
