@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How many paychecks until Christmas 2026? Savings per paycheck calculator</title>
+<meta name="description" content="Count the paydays you have left before Christmas 2026 (weekly, biweekly, twice a month or monthly) and how much to set aside from each one to reach your gift budget without debt.">
+<link rel="canonical" href="https://torqsheeet.github.io/paychecks-until-christmas-2026/">
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:720px;margin:0 auto;padding:24px 18px 60px;line-height:1.55;color:#1d2a26;background:#fbfaf6}
+h1{font-size:1.8rem;line-height:1.2;margin:.2em 0 .4em} h2{font-size:1.25rem;margin-top:2em}
+table{border-collapse:collapse;width:100%;margin:1em 0} th,td{border-bottom:1px solid #d9d6cc;padding:7px 8px;text-align:left} th{background:#e8efe9}
+.box{background:#fff;border:1px solid #d9d6cc;border-radius:8px;padding:16px;margin:1.2em 0}
+.box label{display:block;margin:8px 0 2px}
+input,select,button{font-size:1rem;padding:6px 10px} button{margin-top:12px} #out{margin-top:12px}
+small,.note{color:#5b6660} a{color:#1f6b4f}
+</style>
+</head>
+<body>
+<p class="note"><a href="/">Torqsheet</a> &middot; budgeting notes</p>
+<h1>How many paychecks until Christmas 2026?</h1>
+<p>Christmas Day 2026 is a <strong>Friday</strong>. If you want the gift money in hand before you
+shop, the useful number is not the days left but the <strong>paydays</strong> left, because that is
+how many chances you have to set money aside. Enter your next payday and the calculator counts
+them and splits your goal across them.</p>
+
+<div class="box">
+<label for="next">Your next payday (or today's, if it is today):</label>
+<input type="date" id="next">
+<label for="freq">How often you are paid:</label>
+<select id="freq">
+<option value="w">Weekly</option>
+<option value="b" selected>Every two weeks (biweekly)</option>
+<option value="s">Twice a month (15th and last day)</option>
+<option value="m">Monthly (same date each month)</option>
+</select>
+<label for="dl">Money needed by (last day you will shop):</label>
+<input type="date" id="dl" value="2026-12-20">
+<label for="goal">Christmas budget (gifts, food, travel):</label>
+<input type="number" id="goal" value="800" min="0" step="10">
+<label for="have">Already saved for it:</label>
+<input type="number" id="have" value="0" min="0" step="10">
+<br><button id="go">Count my paydays</button>
+<div id="out"></div>
+<small>Runs in your browser; nothing is sent anywhere. Weekend and holiday date shifts are not
+applied: if your payroll moves a payday, check that date yourself.</small>
+</div>
+
+<h2>Biweekly Friday paydays, November to Christmas 2026</h2>
+<p>Most biweekly payrolls that pay on Fridays are on one of two patterns. Find a payday you know
+in this table to see which one is yours.</p>
+<table>
+<tr><th>Pattern</th><th>Paydays from 1 November 2026</th><th>Before 20 Dec</th></tr>
+<tr><td>A (also paid Fri 1 Jan 2027)</td><td>6 Nov, 20 Nov, 4 Dec, 18 Dec</td><td>4</td></tr>
+<tr><td>B</td><td>13 Nov, 27 Nov, 11 Dec, 25 Dec</td><td>3</td></tr>
+</table>
+<p>Pattern B's last payday falls on Christmas Day itself. Because 25 December is a bank holiday,
+many payrolls pay the working day before (Thursday 24 December), which is late for shopping. If
+you are on pattern B, plan on three paydays, not four. Pattern A is the one that gets
+<a href="/27-paychecks-2027/">27 paychecks in 2027</a>.</p>
+
+<h2>Making the number work</h2>
+<ul>
+<li><strong>Move it on payday.</strong> Set the per-paycheck amount aside the day you are paid
+(a separate savings account or envelope), before ordinary spending gets to it.</li>
+<li><strong>If the amount is too high,</strong> lower the goal now rather than finishing on a
+credit card in January. Gifts, food and travel are usually the three lines to trim.</li>
+<li><strong>Next year, start in January.</strong> The same goal over 26 biweekly paydays is a
+much smaller amount each time. That is a sinking fund: a yearly cost saved for a bit at a time.</li>
+</ul>
+<p>This is general budgeting information, not financial advice.</p>
+
+<h2>Free spreadsheet</h2>
+<p>To plan December as budget against actual, there is a free Excel sheet:
+<a href="https://torqsheet.gumroad.com/l/one-month-budget-starter?utm_source=torqsheet-site&amp;utm_campaign=paychecks-until-christmas-2026">One Month Budget Starter</a>
+(EUR 0, .xlsx, no macros). If you want to plan by paycheck rather than by month, Torqsheet also
+sells a <a href="https://torqsheet.gumroad.com/l/paycheck-budget-planner?utm_source=torqsheet-site&amp;utm_campaign=paychecks-until-christmas-2026">Paycheck Budget
+Planner</a> (USD 10.99, Excel). Disclosure: Torqsheet makes and sells these; this page is free
+either way.</p>
+
+<p class="note">Pay dates in the table computed by script for 2026. Spotted a mistake? Open an issue on
+<a href="https://github.com/torqsheeet/torqsheeet.github.io/issues">GitHub</a>.</p>
+
+<script>
+function money(x) { return x.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+function parse(v) { var p = v.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+function fmt(d) { return d.toLocaleDateString(undefined, {weekday: 'short', day: 'numeric', month: 'short'}); }
+function lastDay(y, m) { return new Date(y, m + 1, 0).getDate(); }
+function paydays(start, freq, end) {
+  var out = [], d, i;
+  if (freq === 'w' || freq === 'b') {
+    var step = freq === 'w' ? 7 : 14;
+    for (d = new Date(start); d <= end; d.setDate(d.getDate() + step)) out.push(new Date(d));
+  } else if (freq === 'm') {
+    var day = start.getDate();
+    for (i = 0; i < 24; i++) {
+      var y = start.getFullYear(), m = start.getMonth() + i;
+      d = new Date(y, m, Math.min(day, lastDay(y, m)));
+      if (d > end) break;
+      out.push(d);
+    }
+  } else {
+    for (i = 0; i < 24; i++) {
+      var first = new Date(start.getFullYear(), start.getMonth() + i, 1);
+      var a = new Date(first.getFullYear(), first.getMonth(), 15);
+      var b = new Date(first.getFullYear(), first.getMonth(), lastDay(first.getFullYear(), first.getMonth()));
+      [a, b].forEach(function (x) { if (x >= start && x <= end) out.push(x); });
+      if (a > end) break;
+    }
+  }
+  return out;
+}
+var t = new Date(); t.setHours(0, 0, 0, 0);
+var dflt = new Date(t); dflt.setDate(t.getDate() + ((5 - t.getDay() + 7) % 7));
+document.getElementById('next').value = dflt.getFullYear() + '-' + String(dflt.getMonth() + 1).padStart(2, '0') + '-' + String(dflt.getDate()).padStart(2, '0');
+document.getElementById('go').onclick = function () {
+  var out = document.getElementById('out');
+  var nv = document.getElementById('next').value, dv = document.getElementById('dl').value;
+  var goal = parseFloat(document.getElementById('goal').value) || 0;
+  var have = parseFloat(document.getElementById('have').value) || 0;
+  if (!nv || !dv) { out.textContent = 'Enter your next payday and the date you need the money by.'; return; }
+  var start = parse(nv), end = parse(dv), freq = document.getElementById('freq').value;
+  if (end < start) { out.textContent = 'The date you need the money by is before your next payday, so there are no paydays left to save from.'; return; }
+  var list = paydays(start, freq, end), left = Math.max(goal - have, 0);
+  if (!list.length) { out.textContent = 'No paydays fall between those dates.'; return; }
+  out.innerHTML = '<p><strong>' + list.length + ' payday' + (list.length === 1 ? '' : 's') + '</strong> left by ' + fmt(end) +
+    ': ' + list.map(fmt).join(', ') + '.</p>' +
+    (left > 0 ? '<p>Set aside <strong>' + money(left / list.length) + '</strong> from each one to reach ' + money(goal) +
+      ' (' + money(left) + ' still to save).</p>' : '<p>You have already saved the full amount.</p>');
+};
+document.getElementById('go').click();
+</script>
+</body>
+</html>
