@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lap time consistency calculator: best, average, spread and seconds</title>
+<meta name="description" content="Paste your lap times (1:58.412 or 118.412) and get your best lap, average, median, best-to-average gap, standard deviation, laps within a margin of your best and your best three-lap run. Free, runs in your browser.">
+<link rel="canonical" href="https://torqsheeet.github.io/lap-time-consistency-calculator/">
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:720px;margin:0 auto;padding:24px 18px 60px;line-height:1.55;color:#1d2a26;background:#fbfaf6}
+h1{font-size:1.8rem;line-height:1.2;margin:.2em 0 .4em} h2{font-size:1.25rem;margin-top:2em}
+table{border-collapse:collapse;width:100%;margin:1em 0} th,td{border-bottom:1px solid #d9d6cc;padding:7px 8px;text-align:left} th{background:#e8efe9}
+.box{background:#fff;border:1px solid #d9d6cc;border-radius:8px;padding:16px;margin:1.2em 0}
+.box label{display:block;margin:8px 0 2px}
+input,select,button,textarea{font-size:1rem;padding:6px 10px} textarea{width:100%;box-sizing:border-box;font-family:ui-monospace,Consolas,monospace}
+button{margin-top:12px} #out{margin-top:12px} .ign{color:#8a8f8b}
+small,.note{color:#5b6660} a{color:#1f6b4f}
+</style>
+</head>
+<body>
+<p class="note"><a href="/">Torqsheet</a> &middot; lap time tools</p>
+<h1>Lap time consistency calculator</h1>
+<p>Your best lap says how fast you can go once. Your <strong>average</strong> and your
+<strong>spread</strong> say how fast you actually go, lap after lap, which is what a race is made
+of. Paste the laps from one session and the calculator works out both, ignoring out laps and spins
+if you want it to.</p>
+
+<div class="box">
+<label for="laps">Lap times, one per line, in order (1:58.412, 118.412 or 1:02:03.5 all work; a comma is read as a decimal point):</label>
+<textarea id="laps" rows="9">1:58.912
+1:57.884
+1:58.301
+1:57.640
+2:09.775
+1:57.912
+1:58.104
+1:57.701
+1:58.455
+1:57.966</textarea>
+<label for="slow">Ignore laps more than this % slower than your best (out laps, spins, traffic):</label>
+<input type="number" id="slow" value="7" min="0" step="0.5"> %
+<label for="win">Count a lap as "close to your best" within this many seconds:</label>
+<input type="number" id="win" value="0.5" min="0" step="0.1"> s
+<label><input type="checkbox" id="first"> Leave out the first lap (standing start or out lap)</label>
+<button id="go">Work it out</button>
+<div id="out"></div>
+<small>Runs in your browser; nothing is sent anywhere. The example laps are made up.</small>
+</div>
+
+<h2>What the numbers mean</h2>
+<ul>
+<li><strong>Best to average gap</strong>: how far your typical lap is from your best one. If you
+shave your best lap but this gap grows, the race pace may not have improved at all.</li>
+<li><strong>Standard deviation</strong>: how much your laps scatter around the average, in
+seconds. Two drivers with the same average can have very different spreads; the smaller one makes
+fewer mistakes.</li>
+<li><strong>Laps close to your best</strong>: a plain count that is easy to compare between
+sessions, as long as you keep the same margin.</li>
+<li><strong>Best three-lap run</strong>: the fastest average over three laps in a row with none of
+them ignored. It is a fairer pace figure than one lucky lap.</li>
+</ul>
+<p>The numbers are only comparable for the same track, car and conditions. When you test a setup
+change, change one thing at a time and run enough laps that one good or bad lap does not decide
+it.</p>
+
+<h2>Free lap and setup log</h2>
+<p>To keep these numbers next to the setup you drove them on, there is a free Excel sheet:
+<a href="https://torqsheet.gumroad.com/l/torqsheet-lap-log?utm_source=torqsheet-site&amp;utm_campaign=lap-time-consistency-calculator">Lap and Setup Log</a>
+(USD 0 or pay what you want, .xlsx, no macros). It reads 1:58.412 or 118.412, and shows best lap,
+average lap and the gap between them for every row you log. Disclosure: Torqsheet makes it.</p>
+
+<p class="note">Spotted a mistake? Open an issue on
+<a href="https://github.com/torqsheeet/torqsheeet.github.io/issues">GitHub</a>.</p>
+
+<script>
+function parseLap(s) {
+  s = s.trim().replace(/,/g, '.');
+  if (!s) return null;
+  var parts;
+  if (s.indexOf(':') >= 0) parts = s.split(':');
+  else if ((s.match(/\./g) || []).length === 2) { var i = s.indexOf('.'); parts = [s.slice(0, i), s.slice(i + 1)]; }
+  else parts = [s];
+  if (parts.length > 3) return NaN;
+  var total = 0;
+  for (var k = 0; k < parts.length; k++) {
+    var last = k === parts.length - 1;
+    if (!(last ? /^\d+(\.\d+)?$/ : /^\d+$/).test(parts[k])) return NaN;
+    var v = parseFloat(parts[k]);
+    if (k > 0 && v >= 60) return NaN;
+    total = total * 60 + v;
+  }
+  return total > 0 ? total : NaN;
+}
+function fmtLap(x) {
+  var r = Math.round(x * 1000) / 1000, h = Math.floor(r / 3600), m = Math.floor((r - h * 3600) / 60), s = r - h * 3600 - m * 60;
+  var ss = s.toFixed(3); if (s < 10) ss = '0' + ss;
+  return h ? h + ':' + String(m).padStart(2, '0') + ':' + ss : m ? m + ':' + ss : s.toFixed(3);
+}
+function analyse(text, slowPct, win, dropFirst) {
+  var laps = [], bad = [];
+  text.split(/[\r\n;\t]+|\s+/).forEach(function (tok) {
+    var v = parseLap(tok);
+    if (v === null) return;
+    if (isNaN(v)) bad.push(tok.trim()); else laps.push({n: laps.length + 1, t: v, ign: ''});
+  });
+  if (dropFirst && laps.length) laps[0].ign = 'first lap';
+  var pool = laps.filter(function (l) { return !l.ign; });
+  if (!pool.length) return {laps: laps, bad: bad, used: []};
+  var best = Math.min.apply(null, pool.map(function (l) { return l.t; }));
+  laps.forEach(function (l) { if (!l.ign && l.t > best * (1 + slowPct / 100)) l.ign = 'over ' + slowPct + '% slower'; });
+  var used = laps.filter(function (l) { return !l.ign; }), ts = used.map(function (l) { return l.t; });
+  var n = ts.length, avg = ts.reduce(function (a, b) { return a + b; }, 0) / n;
+  var sorted = ts.slice().sort(function (a, b) { return a - b; });
+  var med = n % 2 ? sorted[(n - 1) / 2] : (sorted[n / 2 - 1] + sorted[n / 2]) / 2;
+  var sd = n > 1 ? Math.sqrt(ts.reduce(function (a, b) { return a + (b - avg) * (b - avg); }, 0) / (n - 1)) : null;
+  var close = ts.filter(function (t) { return t - best <= win + 1e-9; }).length;
+  var run = null;
+  for (var i = 0; i + 2 < laps.length; i++) {
+    var w = laps.slice(i, i + 3);
+    if (w.some(function (l) { return l.ign; })) continue;
+    var a3 = (w[0].t + w[1].t + w[2].t) / 3;
+    if (!run || a3 < run.avg) run = {avg: a3, from: w[0].n};
+  }
+  return {laps: laps, bad: bad, used: used, best: best, bestLap: used.filter(function (l) { return l.t === best; })[0].n,
+    avg: avg, med: med, worst: sorted[n - 1], sd: sd, close: close, run: run};
+}
+document.getElementById('go').onclick = function () {
+  var out = document.getElementById('out');
+  var r = analyse(document.getElementById('laps').value, parseFloat(document.getElementById('slow').value) || 0,
+    parseFloat(document.getElementById('win').value) || 0, document.getElementById('first').checked);
+  var html = '';
+  if (r.bad.length) html += '<p>Could not read: ' + r.bad.map(function (b) { return b.replace(/[<>&]/g, ''); }).join(', ') + '</p>';
+  if (!r.used.length) { out.innerHTML = html + '<p>Paste at least one lap time.</p>'; return; }
+  var win = parseFloat(document.getElementById('win').value) || 0;
+  html += '<table>' +
+    '<tr><td>Laps counted</td><td>' + r.used.length + ' of ' + r.laps.length + '</td></tr>' +
+    '<tr><td>Best lap</td><td>' + fmtLap(r.best) + ' (lap ' + r.bestLap + ')</td></tr>' +
+    '<tr><td>Average</td><td>' + fmtLap(r.avg) + '</td></tr>' +
+    '<tr><td>Median</td><td>' + fmtLap(r.med) + '</td></tr>' +
+    '<tr><td>Slowest counted</td><td>' + fmtLap(r.worst) + '</td></tr>' +
+    '<tr><td>Best to average gap</td><td>' + (r.avg - r.best).toFixed(3) + ' s</td></tr>' +
+    '<tr><td>Standard deviation</td><td>' + (r.sd === null ? 'needs 2 laps' : r.sd.toFixed(3) + ' s') + '</td></tr>' +
+    '<tr><td>Laps within ' + win + ' s of best</td><td>' + r.close + ' of ' + r.used.length + '</td></tr>' +
+    '<tr><td>Best three-lap run</td><td>' + (r.run ? fmtLap(r.run.avg) + ' average, laps ' + r.run.from + '-' + (r.run.from + 2) : 'needs 3 counted laps in a row') + '</td></tr>' +
+    '</table><table><tr><th>Lap</th><th>Time</th><th>Seconds</th><th>To best</th></tr>' +
+    r.laps.map(function (l) {
+      return '<tr' + (l.ign ? ' class="ign"' : '') + '><td>' + l.n + '</td><td>' + fmtLap(l.t) + '</td><td>' + l.t.toFixed(3) +
+        '</td><td>' + (l.ign ? 'ignored: ' + l.ign : '+' + (l.t - r.best).toFixed(3)) + '</td></tr>';
+    }).join('') + '</table>';
+  out.innerHTML = html;
+};
+document.getElementById('go').click();
+</script>
+</body>
+</html>
