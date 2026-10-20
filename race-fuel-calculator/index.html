@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Race fuel calculator: fuel for a lap or timed race, with margin and stops</title>
+<meta name="description" content="Work out how much fuel to start a race with: lap or timed races, fuel per lap, safety laps, formation lap and tank size, with the number of refuelling stops and fuel per stint. Free, runs in your browser.">
+<link rel="canonical" href="https://torqsheeet.github.io/race-fuel-calculator/">
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:720px;margin:0 auto;padding:24px 18px 60px;line-height:1.55;color:#1d2a26;background:#fbfaf6}
+h1{font-size:1.8rem;line-height:1.2;margin:.2em 0 .4em} h2{font-size:1.25rem;margin-top:2em}
+table{border-collapse:collapse;width:100%;margin:1em 0} th,td{border-bottom:1px solid #d9d6cc;padding:7px 8px;text-align:left} th{background:#e8efe9}
+.box{background:#fff;border:1px solid #d9d6cc;border-radius:8px;padding:16px;margin:1.2em 0}
+.box label{display:block;margin:8px 0 2px}
+input,select,button{font-size:1rem;padding:6px 10px}
+button{margin-top:12px} #out{margin-top:12px}
+small,.note{color:#5b6660} a{color:#1f6b4f}
+</style>
+</head>
+<body>
+<p class="note"><a href="/">Torqsheet</a> &middot; lap time tools</p>
+<h1>Race fuel calculator</h1>
+<p>How much fuel to put in for a race: enough to finish with a margin, not so much that you carry
+dead weight for the whole stint. Enter the race length, your lap time and what one lap uses. Works
+for lap races and timed races, in litres, kilograms, gallons or whatever unit your car shows.</p>
+
+<div class="box">
+<label for="kind">Race length is set by:</label>
+<select id="kind"><option value="laps">Number of laps</option><option value="time">Time (minutes)</option></select>
+<label for="len" id="lenlabel">Laps:</label>
+<input type="number" id="len" value="20" min="0" step="1">
+<label for="lap">Your average race lap (1:58.4 or 118.4; needed for timed races):</label>
+<input type="text" id="lap" value="1:58.4">
+<label for="fpl">Fuel used per lap:</label>
+<input type="number" id="fpl" value="2.85" min="0" step="0.01">
+<label for="extra">Safety margin, in laps of fuel:</label>
+<input type="number" id="extra" value="1" min="0" step="0.5">
+<label><input type="checkbox" id="form" checked> Add a formation lap (it burns fuel too)</label>
+<label for="tank">Tank capacity (leave blank if the race is one stint):</label>
+<input type="number" id="tank" value="" min="0" step="0.1">
+<button id="go">Work it out</button>
+<div id="out"></div>
+<small>Runs in your browser; nothing is sent anywhere. The example numbers are made up.</small>
+</div>
+
+<h2>How it is worked out</h2>
+<ul>
+<li><strong>Lap race</strong>: race laps, plus the formation lap if ticked, times fuel per lap.</li>
+<li><strong>Timed race</strong>: when the clock runs out you still finish the lap you are on, so
+the laps are the race time divided by your lap time, rounded down, plus one. If you are lapped you
+will do fewer; if the leader is faster than you, or the rules add a lap, you may do one more, so
+keep at least one lap of margin.</li>
+<li><strong>Margin</strong>: extra laps of fuel on top, for a fuel-hungry lap in traffic, a
+safety car or a cool-down lap if your series needs one.</li>
+<li><strong>Stops</strong>: if the total is more than the tank holds, the calculator splits the
+race into equal stints and says how much each stint needs. It does not count fuel used in the pit
+lane or the time a stop costs.</li>
+</ul>
+<p>The figure is only as good as the fuel per lap you enter. Measure it over a few clean laps at
+race pace, not on a qualifying lap or a lift-and-coast lap, and measure it again if the weather,
+the track or the car's engine map changes.</p>
+
+<h2>Related</h2>
+<p>To see whether your race pace is steady enough to trust the lap time you entered, paste a
+session into the <a href="/lap-time-consistency-calculator/">lap time consistency calculator</a>.
+To keep lap times and fuel notes next to the setup you drove them on, there is a free Excel sheet:
+<a href="https://torqsheet.gumroad.com/l/torqsheet-lap-log?utm_source=torqsheet-site&amp;utm_campaign=race-fuel-calculator">Lap and Setup Log</a>
+(USD 0 or pay what you want, .xlsx, no macros). Disclosure: Torqsheet makes it.</p>
+
+<p class="note">Spotted a mistake? Open an issue on
+<a href="https://github.com/torqsheeet/torqsheeet.github.io/issues">GitHub</a>.</p>
+
+<script>
+function parseLap(s) {
+  s = String(s).trim().replace(/,/g, '.');
+  if (!s) return NaN;
+  var parts = s.split(':');
+  if (parts.length > 3) return NaN;
+  var total = 0;
+  for (var k = 0; k < parts.length; k++) {
+    var last = k === parts.length - 1;
+    if (!(last ? /^\d+(\.\d+)?$/ : /^\d+$/).test(parts[k])) return NaN;
+    var v = parseFloat(parts[k]);
+    if (k > 0 && v >= 60) return NaN;
+    total = total * 60 + v;
+  }
+  return total > 0 ? total : NaN;
+}
+function fuelPlan(o) {
+  // o: kind 'laps'|'time', len (laps or minutes), lap (seconds), fpl, extra (laps), form (bool), tank (number or NaN)
+  if (!(o.len > 0) || !(o.fpl > 0)) return {err: 'Enter a race length and the fuel used per lap.'};
+  var laps;
+  if (o.kind === 'time') {
+    if (!(o.lap > 0)) return {err: 'Enter your lap time for a timed race (for example 1:58.4).'};
+    laps = Math.floor(o.len * 60 / o.lap + 1e-9) + 1;
+  } else {
+    if (Math.floor(o.len) !== o.len) return {err: 'A lap race needs a whole number of laps.'};
+    laps = o.len;
+  }
+  var extra = o.extra > 0 ? o.extra : 0, formLap = o.form ? 1 : 0;
+  var r = {laps: laps, formLap: formLap, extra: extra, race: laps * o.fpl, total: (laps + formLap + extra) * o.fpl, stops: 0};
+  if (o.tank > 0 && r.total > o.tank + 1e-9) {
+    var stints = Math.ceil(r.total / o.tank - 1e-9);
+    r.stops = stints - 1;
+    r.perStint = r.total / stints;
+    r.lapsPerTank = Math.floor(o.tank / o.fpl + 1e-9);
+  }
+  return r;
+}
+if (typeof document !== 'undefined') {
+  var $ = function (id) { return document.getElementById(id); };
+  var fmt = function (x) { return (Math.round(x * 100) / 100).toFixed(2); };
+  $('kind').onchange = function () {
+    var t = $('kind').value === 'time';
+    $('lenlabel').textContent = t ? 'Race time, minutes:' : 'Laps:';
+    $('len').value = t ? 45 : 20;
+    $('go').click();
+  };
+  $('go').onclick = function () {
+    var fpl = parseFloat($('fpl').value), timed = $('kind').value === 'time';
+    var r = fuelPlan({kind: $('kind').value, len: parseFloat($('len').value), lap: parseLap($('lap').value),
+      fpl: fpl, extra: parseFloat($('extra').value), form: $('form').checked, tank: parseFloat($('tank').value)});
+    if (r.err) { $('out').innerHTML = '<p>' + r.err + '</p>'; return; }
+    var rows = '<tr><td>Race laps</td><td>' + r.laps + (timed ? ' (at your lap time)' : '') + '</td></tr>' +
+      '<tr><td>Fuel for the race laps</td><td>' + fmt(r.race) + '</td></tr>' +
+      (r.formLap ? '<tr><td>Formation lap</td><td>+' + fmt(fpl) + '</td></tr>' : '') +
+      (r.extra ? '<tr><td>Margin (' + r.extra + ' lap' + (r.extra === 1 ? '' : 's') + ')</td><td>+' + fmt(r.extra * fpl) + '</td></tr>' : '') +
+      '<tr><th>Fuel needed in total</th><th>' + fmt(r.total) + '</th></tr>';
+    if (r.stops) rows += '<tr><td>Tank holds</td><td>' + r.lapsPerTank + ' laps of fuel</td></tr>' +
+      '<tr><td>Refuelling stops</td><td>' + r.stops + '</td></tr>' +
+      '<tr><th>Fuel per stint (' + (r.stops + 1) + ' equal stints)</th><th>' + fmt(r.perStint) + '</th></tr>';
+    $('out').innerHTML = '<table>' + rows + '</table>' +
+      (r.stops ? '<p class="note">Equal stints spread the margin and the formation lap over the race. You can also start on a full tank and take only what is left at the last stop.</p>' : '');
+  };
+  $('go').click();
+}
+if (typeof module !== 'undefined') module.exports = {parseLap: parseLap, fuelPlan: fuelPlan};
+</script>
+</body>
+</html>
