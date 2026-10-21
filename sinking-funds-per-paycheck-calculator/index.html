@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sinking funds calculator: how much to save per paycheck for each goal</title>
+<meta name="description" content="List your yearly and irregular costs (insurance, gifts, car repairs, subscriptions) with their due dates. The calculator counts your paydays before each one and tells you what to set aside from every paycheck. Free, runs in your browser.">
+<link rel="canonical" href="https://torqsheeet.github.io/sinking-funds-per-paycheck-calculator/">
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:760px;margin:0 auto;padding:24px 18px 60px;line-height:1.55;color:#1d2a26;background:#fbfaf6}
+h1{font-size:1.8rem;line-height:1.2;margin:.2em 0 .4em} h2{font-size:1.25rem;margin-top:2em}
+table{border-collapse:collapse;width:100%;margin:1em 0} th,td{border-bottom:1px solid #d9d6cc;padding:7px 8px;text-align:left} th{background:#e8efe9}
+.box{background:#fff;border:1px solid #d9d6cc;border-radius:8px;padding:16px;margin:1.2em 0}
+.box label{display:block;margin:8px 0 2px}
+input,select,button{font-size:1rem;padding:6px 10px} button{margin-top:12px} #out{margin-top:12px}
+#goals input{width:100%;box-sizing:border-box;padding:5px 6px} #goals td{padding:4px}
+small,.note{color:#5b6660} a{color:#1f6b4f}
+</style>
+</head>
+<body>
+<p class="note"><a href="/">Torqsheet</a> &middot; budgeting notes</p>
+<h1>Sinking funds calculator: what to save from each paycheck</h1>
+<p>A <strong>sinking fund</strong> is money you put aside a little at a time for a cost you know is
+coming: the car insurance renewal, Christmas, a yearly subscription, the next set of tyres. The
+bill stops being a surprise because it was paid for in small pieces. The useful question is how
+much to move on each payday, and that depends on how many paydays you have before each due date.
+List your goals below and the calculator works it out.</p>
+
+<div class="box">
+<label for="next">Your next payday:</label>
+<input type="date" id="next">
+<label for="freq">How often you are paid:</label>
+<select id="freq">
+<option value="w">Weekly</option>
+<option value="b" selected>Every two weeks (biweekly)</option>
+<option value="s">Twice a month (15th and last day)</option>
+<option value="m">Monthly (same date each month)</option>
+</select>
+<p style="margin:14px 0 0">Your goals (edit, clear or add rows):</p>
+<table id="goals">
+<tr><th>Goal</th><th>Amount</th><th>Due date</th><th>Already saved</th></tr>
+</table>
+<button id="add" type="button">Add a row</button>
+<button id="go" type="button">Work out per paycheck</button>
+<div id="out"></div>
+<small>Runs in your browser; nothing is sent anywhere. A payday on the due date counts. Weekend and
+holiday shifts are not applied: if your payroll moves a payday, check that date yourself.</small>
+</div>
+
+<h2>How the numbers work</h2>
+<p>For each goal: (amount minus what you have already saved) divided by the number of paydays from
+your next one up to the due date. A goal due soon gets a large share; a goal a year away gets a
+small one. The total is what to move on your next payday. When a goal is paid, its share drops out
+and the total falls, so the first few months are usually the most expensive. If that first total is
+too high, push back a due date you control (a holiday, a gadget), lower an amount, or start with the
+goals that would otherwise land on a credit card.</p>
+<p>Spreading every cost evenly over the year instead (yearly total divided by paychecks per year:
+52 weekly, 26 biweekly, 24 twice a month, 12 monthly) gives a smaller, flat amount, but only works
+if each fund already holds enough for the bills that fall early in the year.</p>
+
+<h2>Common sinking funds</h2>
+<ul>
+<li>Insurance paid yearly or every six months (car, home, contents).</li>
+<li>Christmas and birthdays; see also <a href="/paychecks-until-christmas-2026/">how many paychecks until Christmas 2026</a>.</li>
+<li>Car upkeep: servicing, tyres, registration or road tax.</li>
+<li>Yearly subscriptions and memberships.</li>
+<li>Holidays and travel.</li>
+<li>Medical, dental and glasses costs not covered elsewhere.</li>
+</ul>
+<p>Biweekly pay means some months have three paydays; those are a good time to top up the funds that
+are behind. See <a href="/three-paycheck-months-2027/">three-paycheck months in 2027</a>.</p>
+<p>This is general budgeting information, not financial advice.</p>
+
+<h2>Spreadsheets</h2>
+<p>To plan a single month as budget against actual, there is a free Excel sheet:
+<a href="https://torqsheet.gumroad.com/l/one-month-budget-starter?utm_source=torqsheet-site&amp;utm_campaign=sinking-funds-per-paycheck-calculator">One Month Budget Starter</a>
+(EUR 0, .xlsx, no macros). If you want to budget pay period by pay period, Torqsheet also sells a
+<a href="https://torqsheet.gumroad.com/l/paycheck-budget-planner?utm_source=torqsheet-site&amp;utm_campaign=sinking-funds-per-paycheck-calculator">Paycheck Budget Planner</a>
+(USD 10.99, Excel). Disclosure: Torqsheet makes and sells these; this page is free either way.</p>
+
+<p class="note">Spotted a mistake? Open an issue on
+<a href="https://github.com/torqsheeet/torqsheeet.github.io/issues">GitHub</a>.</p>
+
+<script>
+function money(x) { return x.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+function parse(v) { var p = v.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+function iso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function fmt(d) { return d.toLocaleDateString(undefined, {day: 'numeric', month: 'short', year: 'numeric'}); }
+function esc(s) { return s.replace(/[&<>"]/g, function (c) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]; }); }
+function lastDay(y, m) { return new Date(y, m + 1, 0).getDate(); }
+function paydays(start, freq, end) {
+  var out = [], d, i;
+  if (freq === 'w' || freq === 'b') {
+    var step = freq === 'w' ? 7 : 14;
+    for (d = new Date(start); d <= end; d.setDate(d.getDate() + step)) out.push(new Date(d));
+  } else if (freq === 'm') {
+    var day = start.getDate();
+    for (i = 0; i < 60; i++) {
+      var y = start.getFullYear(), m = start.getMonth() + i;
+      d = new Date(y, m, Math.min(day, lastDay(y, m)));
+      if (d > end) break;
+      out.push(d);
+    }
+  } else {
+    for (i = 0; i < 60; i++) {
+      var fy = start.getFullYear(), fm = start.getMonth() + i;
+      var a = new Date(fy, fm, 15), b = new Date(fy, fm, lastDay(fy, fm));
+      [a, b].forEach(function (x) { if (x >= start && x <= end) out.push(x); });
+      if (a > end) break;
+    }
+  }
+  return out;
+}
+function addRow(name, amt, due, have) {
+  var tr = document.createElement('tr');
+  tr.innerHTML = '<td><input class="n"></td><td><input class="a" type="number" min="0" step="10"></td>' +
+    '<td><input class="d" type="date"></td><td><input class="h" type="number" min="0" step="10"></td>';
+  tr.querySelector('.n').value = name || ''; tr.querySelector('.a').value = amt === undefined ? '' : amt;
+  tr.querySelector('.d').value = due || ''; tr.querySelector('.h').value = have === undefined ? '' : have;
+  document.getElementById('goals').appendChild(tr);
+}
+var t = new Date(); t.setHours(0, 0, 0, 0);
+var nx = new Date(t); nx.setDate(t.getDate() + ((5 - t.getDay() + 7) % 7));
+document.getElementById('next').value = iso(nx);
+function ahead(months, day) { var d = new Date(t.getFullYear(), t.getMonth() + months, 1); d.setDate(Math.min(day, lastDay(d.getFullYear(), d.getMonth()))); return iso(d); }
+addRow('Car insurance renewal', 600, ahead(5, 15), 0);
+addRow('Christmas next year', 900, (t.getFullYear() + 1) + '-12-10', 0);
+addRow('Car service and tyres', 450, ahead(8, 1), 100);
+addRow('Yearly subscriptions', 120, ahead(3, 1), 0);
+document.getElementById('add').onclick = function () { addRow(); };
+document.getElementById('go').onclick = function () {
+  var out = document.getElementById('out');
+  var nv = document.getElementById('next').value;
+  if (!nv) { out.textContent = 'Enter your next payday.'; return; }
+  var start = parse(nv), freq = document.getElementById('freq').value;
+  var rows = [], total = 0, skipped = [];
+  document.querySelectorAll('#goals tr').forEach(function (tr) {
+    var n = tr.querySelector('.n'); if (!n) return;
+    var name = n.value.trim() || 'Unnamed goal';
+    var amt = parseFloat(tr.querySelector('.a').value), dv = tr.querySelector('.d').value;
+    var have = parseFloat(tr.querySelector('.h').value) || 0;
+    if (!(amt > 0) || !dv) { if (n.value.trim() || dv || amt > 0) skipped.push(name + ' (needs an amount and a due date)'); return; }
+    var due = parse(dv), left = Math.max(amt - have, 0);
+    var list = due >= start ? paydays(start, freq, due) : [];
+    if (left === 0) { rows.push([name, fmt(due), '-', 'already saved']); return; }
+    if (!list.length) { skipped.push(name + ' (no payday before ' + fmt(due) + ')'); return; }
+    var per = left / list.length; total += per;
+    rows.push([name, fmt(due), String(list.length), money(per)]);
+  });
+  if (!rows.length && !skipped.length) { out.textContent = 'Add at least one goal with an amount and a due date.'; return; }
+  var h = '<table><tr><th>Goal</th><th>Due</th><th>Paydays left</th><th>Per paycheck</th></tr>' +
+    rows.map(function (r) { return '<tr><td>' + esc(r[0]) + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td><td>' + r[3] + '</td></tr>'; }).join('') + '</table>';
+  h += '<p>Move <strong>' + money(total) + '</strong> into your sinking funds on your next payday (' + fmt(start) + ').</p>';
+  if (skipped.length) h += '<p><small>Not counted: ' + skipped.map(esc).join('; ') + '. A cost with no payday left before it has to come from money you already have.</small></p>';
+  out.innerHTML = h;
+};
+document.getElementById('go').click();
+</script>
+</body>
+</html>
