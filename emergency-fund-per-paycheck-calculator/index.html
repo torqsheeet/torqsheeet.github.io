@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emergency fund calculator: how much to save per paycheck, and when you get there</title>
+<meta name="description" content="Enter your essential monthly costs, how many months you want covered and what you have saved. The calculator counts your paydays to a target date and tells you what to set aside from each paycheck, or when a fixed amount per paycheck gets you there. Free, runs in your browser.">
+<link rel="canonical" href="https://torqsheeet.github.io/emergency-fund-per-paycheck-calculator/">
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:760px;margin:0 auto;padding:24px 18px 60px;line-height:1.55;color:#1d2a26;background:#fbfaf6}
+h1{font-size:1.8rem;line-height:1.2;margin:.2em 0 .4em} h2{font-size:1.25rem;margin-top:2em}
+table{border-collapse:collapse;width:100%;margin:1em 0} th,td{border-bottom:1px solid #d9d6cc;padding:7px 8px;text-align:left} th{background:#e8efe9}
+.box{background:#fff;border:1px solid #d9d6cc;border-radius:8px;padding:16px;margin:1.2em 0}
+.box label{display:block;margin:8px 0 2px}
+input,select,button{font-size:1rem;padding:6px 10px} button{margin-top:12px} #out{margin-top:12px}
+small,.note{color:#5b6660} a{color:#1f6b4f}
+</style>
+</head>
+<body>
+<p class="note"><a href="/">Torqsheet</a> &middot; budgeting notes</p>
+<h1>Emergency fund calculator: what to save from each paycheck</h1>
+<p>An <strong>emergency fund</strong> is cash set aside for the month that goes wrong: a lost job, a
+car that will not start, a boiler, a vet bill. A common rule of thumb is three to six months of
+<em>essential</em> costs (rent or mortgage, utilities, food, insurance, minimum debt payments,
+transport), not of everything you spend. Big round targets are hard to start on, so this calculator
+breaks yours into paydays: what to move on each one to reach the target by a date, or when a fixed
+amount per paycheck gets you there.</p>
+
+<div class="box">
+<label for="exp">Essential costs per month:</label>
+<input type="number" id="exp" min="0" step="50" value="2500">
+<label for="months">Months you want covered:</label>
+<select id="months">
+<option value="1">1 month (a starter fund)</option>
+<option value="3" selected>3 months</option>
+<option value="4">4 months</option>
+<option value="6">6 months</option>
+<option value="9">9 months</option>
+<option value="12">12 months</option>
+</select>
+<label for="have">Already saved for emergencies:</label>
+<input type="number" id="have" min="0" step="50" value="500">
+<label for="next">Your next payday:</label>
+<input type="date" id="next">
+<label for="freq">How often you are paid:</label>
+<select id="freq">
+<option value="w">Weekly</option>
+<option value="b" selected>Every two weeks (biweekly)</option>
+<option value="s">Twice a month (15th and last day)</option>
+<option value="m">Monthly (same date each month)</option>
+</select>
+<label for="by">Target date:</label>
+<input type="date" id="by">
+<label for="per">Or: what you can save per paycheck (optional):</label>
+<input type="number" id="per" min="0" step="10" value="150">
+<br><button id="go" type="button">Work it out</button>
+<div id="out"></div>
+<small>Runs in your browser; nothing is sent anywhere. A payday on the target date counts. Weekend and
+holiday shifts are not applied. Interest on the savings is ignored, so a savings account that pays
+interest gets you there a little sooner.</small>
+</div>
+
+<h2>How the numbers work</h2>
+<p>Target = essential monthly costs &times; months covered. Still to save = target minus what you
+already have. <strong>Per paycheck</strong> = still to save divided by the paydays from your next one
+up to the target date. <strong>Finish date</strong> = the payday on which a fixed amount per paycheck
+first covers what is left (still to save divided by the amount, rounded up, counted in paydays).</p>
+<p>Example with the starting figures: 2,500 of essential costs a month, three months covered, 500
+already saved. The target is 7,500, so 7,000 is still to save. Paid every two weeks, a year holds 26
+paydays, so it is about 269 a paycheck to get there in twelve months; at 150 a paycheck it takes 47
+paydays, about 21 months.</p>
+
+<h2>Making the number smaller</h2>
+<ul>
+<li>Count essential costs only. A fund that covers rent, food and bills is enough to keep an emergency
+off a credit card; it does not have to cover the gym.</li>
+<li>Start with one month. A starter fund handles most single surprises (a repair, a deposit); build
+from there.</li>
+<li>Put windfalls in: a tax refund, a bonus, or the extra paycheck in a
+<a href="/three-paycheck-months-2027/">three-paycheck month</a> (and <a href="/27-paychecks-2027/">some people get 27 paychecks in 2027</a>).</li>
+<li>Keep known yearly bills out of it. Insurance renewals and Christmas are not emergencies; give them
+their own <a href="/sinking-funds-per-paycheck-calculator/">sinking funds</a> so the emergency fund is
+not spent on them.</li>
+<li>If you also carry high-interest debt, many people build a starter fund first and then split extra
+money between the fund and the debt; see the
+<a href="/debt-snowball-vs-avalanche-calculator/">debt snowball vs avalanche calculator</a>.</li>
+</ul>
+<p>This is general budgeting information, not financial advice. How big a fund you need depends on
+your job, household and other savings.</p>
+
+<h2>Spreadsheets</h2>
+<p>To plan a single month as budget against actual, there is a free Excel sheet:
+<a href="https://torqsheet.gumroad.com/l/one-month-budget-starter?utm_source=torqsheet-site&amp;utm_campaign=emergency-fund-per-paycheck-calculator">One Month Budget Starter</a>
+(EUR 0, .xlsx, no macros). If you want to budget pay period by pay period, Torqsheet also sells a
+<a href="https://torqsheet.gumroad.com/l/paycheck-budget-planner?utm_source=torqsheet-site&amp;utm_campaign=emergency-fund-per-paycheck-calculator">Paycheck Budget Planner</a>
+(USD 10.99, Excel). Disclosure: Torqsheet makes and sells these; this page is free either way.</p>
+
+<p class="note">Spotted a mistake? Open an issue on
+<a href="https://github.com/torqsheeet/torqsheeet.github.io/issues">GitHub</a>.</p>
+
+<script>
+function money(x) { return x.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+function parse(v) { var p = v.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+function iso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function fmt(d) { return d.toLocaleDateString(undefined, {day: 'numeric', month: 'short', year: 'numeric'}); }
+function lastDay(y, m) { return new Date(y, m + 1, 0).getDate(); }
+// Paydays from start, up to end (inclusive) if given, at most max of them.
+function paydays(start, freq, end, max) {
+  var out = [], d, i;
+  if (freq === 'w' || freq === 'b') {
+    var step = freq === 'w' ? 7 : 14;
+    for (d = new Date(start); (!end || d <= end) && out.length < max; d.setDate(d.getDate() + step)) out.push(new Date(d));
+  } else if (freq === 'm') {
+    var day = start.getDate();
+    for (i = 0; out.length < max; i++) {
+      var y = start.getFullYear(), m = start.getMonth() + i;
+      d = new Date(y, m, Math.min(day, lastDay(y, m)));
+      if (end && d > end) break;
+      out.push(d);
+    }
+  } else {
+    for (i = 0; out.length < max; i++) {
+      var fy = start.getFullYear(), fm = start.getMonth() + i;
+      var a = new Date(fy, fm, 15), b = new Date(fy, fm, lastDay(fy, fm));
+      if (end && a > end) break;
+      [a, b].forEach(function (x) { if (x >= start && (!end || x <= end) && out.length < max) out.push(x); });
+    }
+  }
+  return out;
+}
+var t = new Date(); t.setHours(0, 0, 0, 0);
+var nx = new Date(t); nx.setDate(t.getDate() + ((5 - t.getDay() + 7) % 7));
+document.getElementById('next').value = iso(nx);
+var yr = new Date(nx); yr.setDate(yr.getDate() + 363);
+document.getElementById('by').value = iso(yr);
+document.getElementById('go').onclick = function () {
+  var out = document.getElementById('out');
+  var exp = parseFloat(document.getElementById('exp').value), months = +document.getElementById('months').value;
+  var have = parseFloat(document.getElementById('have').value) || 0;
+  var nv = document.getElementById('next').value, bv = document.getElementById('by').value;
+  var per = parseFloat(document.getElementById('per').value);
+  if (!(exp > 0)) { out.textContent = 'Enter your essential costs per month.'; return; }
+  if (!nv) { out.textContent = 'Enter your next payday.'; return; }
+  var start = parse(nv), freq = document.getElementById('freq').value;
+  var target = exp * months, left = Math.max(target - have, 0);
+  var h = '<p>Target: <strong>' + money(target) + '</strong> (' + months + (months === 1 ? ' month' : ' months') + ' of ' + money(exp) + '). Still to save: <strong>' + money(left) + '</strong>.</p>';
+  if (left === 0) { out.innerHTML = h + '<p>You already have the full amount.</p>'; return; }
+  if (bv) {
+    var by = parse(bv), list = by >= start ? paydays(start, freq, by, 1000) : [];
+    if (list.length) h += '<p>To get there by ' + fmt(by) + ': <strong>' + money(left / list.length) + '</strong> on each of your next ' + list.length + ' paydays (' + fmt(start) + ' to ' + fmt(list[list.length - 1]) + ').</p>';
+    else h += '<p>There is no payday between your next payday and the target date; pick a later date.</p>';
+  }
+  if (per > 0) {
+    var need = Math.ceil(left / per - 1e-9);
+    if (need > 1000) h += '<p>At ' + money(per) + ' per paycheck it would take ' + need + ' paydays, more than this calculator lists.</p>';
+    else {
+      var fin = paydays(start, freq, null, need);
+      h += '<p>At <strong>' + money(per) + '</strong> per paycheck it takes <strong>' + need + (need === 1 ? ' payday' : ' paydays') + '</strong>: you reach the target on <strong>' + fmt(fin[fin.length - 1]) + '</strong>' + (need > 1 ? ' (the last deposit is ' + money(left - per * (need - 1)) + ')' : '') + '.</p>';
+    }
+  }
+  out.innerHTML = h;
+};
+document.getElementById('go').click();
+</script>
+</body>
+</html>
