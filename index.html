@@ -1,33 +1,147 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="google-site-verification" content="CcQhGFm3XVJfrM-7H_PfDyO26Qh0WXTAVRvMp1VIGus">
-<title>Torqsheet: budgeting notes and spreadsheets</title>
-<meta name="description" content="Free budgeting notes, a lap time consistency calculator and Excel spreadsheets from Torqsheet.">
-<style>body{font-family:system-ui,sans-serif;max-width:720px;margin:0 auto;padding:24px 18px;line-height:1.55;color:#1d2a26;background:#fbfaf6}a{color:#1f6b4f}</style>
+<title>Torqsheet: free calculators for budgeting by paycheck</title>
+<meta name="description" content="Free calculators that budget by payday: sinking funds and emergency fund per paycheck, three-paycheck months in 2027, debt snowball vs avalanche. Plus simple Excel budgeting sheets. Runs in your browser, no sign-up.">
+<link rel="canonical" href="https://torqsheeet.github.io/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://torqsheeet.github.io/">
+<meta property="og:title" content="Torqsheet: free calculators for budgeting by paycheck">
+<meta property="og:description" content="What to set aside from each payday, which months bring a third paycheck, and how fast a debt goes. Free, no sign-up.">
+<meta name="theme-color" content="#1f6b4f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231f6b4f'/%3E%3Cpath d='M9 10h14v3h-5.5v12h-3V13H9z' fill='%23fff'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#fbfaf6;--ink:#1d2a26;--muted:#5b6660;--line:#d9d6cc;--card:#fff;--accent:#1f6b4f;--accent-ink:#fff;--tint:#e8efe9;--warm:#b7791f}
+@media (prefers-color-scheme:dark){:root{--bg:#141a18;--ink:#e6ebe8;--muted:#9aa6a0;--line:#2c3632;--card:#1b2320;--accent:#4fb38a;--accent-ink:#0d1512;--tint:#1f2c27;--warm:#e0a84f}}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.55;color:var(--ink);background:var(--bg)}
+a{color:var(--accent)}
+.wrap{max-width:980px;margin:0 auto;padding:0 18px}
+header.top{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.1rem;color:var(--ink);text-decoration:none}
+.brand svg{width:28px;height:28px}
+.top nav a{margin-left:18px;color:var(--muted);text-decoration:none;font-size:.95rem}
+.top nav a:hover{color:var(--accent)}
+.hero{padding:36px 0 28px;display:grid;grid-template-columns:1.25fr 1fr;gap:40px;align-items:center}
+.cal{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 18px 14px;box-shadow:0 8px 24px rgba(20,40,30,.07)}
+.cal .t{font-weight:700;margin:0 0 2px}.cal .s{color:var(--muted);font-size:.88rem;margin:0 0 14px}
+.months{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.m{border:1px solid var(--line);border-radius:8px;padding:8px 6px;text-align:center;font-size:.85rem;color:var(--muted)}
+.m b{display:block;font-size:1.15rem;color:var(--ink)}
+.m.three{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}.m.three b{color:var(--accent-ink)}
+.cal .foot{margin:12px 0 0;font-size:.85rem;color:var(--muted)}
+.kicker{color:var(--accent);font-weight:600;font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;margin:0 0 10px}
+h1{font-size:clamp(1.9rem,4.6vw,2.9rem);line-height:1.12;margin:0 0 16px;max-width:20ch}
+.lede{font-size:1.12rem;color:var(--muted);max-width:60ch;margin:0 0 24px}
+.cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.btn{display:inline-block;padding:12px 18px;border-radius:8px;font-weight:600;text-decoration:none;border:1px solid var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{color:var(--accent);background:transparent}
+.btn:hover{filter:brightness(1.08)}
+.trust{margin:16px 0 0;font-size:.92rem;color:var(--muted)}
+section{padding:30px 0}
+h2{font-size:1.45rem;margin:0 0 6px}
+.sub{color:var(--muted);margin:0 0 20px;max-width:62ch}
+.group{margin:22px 0 10px;font-size:.8rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;text-decoration:none;color:var(--ink);transition:border-color .15s,transform .15s}
+a.card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.card h3{font-size:1.05rem;margin:0 0 6px;line-height:1.3;color:var(--ink)}
+.card p{margin:0;color:var(--muted);font-size:.95rem}
+.card .go{margin-top:auto;padding-top:12px;color:var(--accent);font-weight:600;font-size:.92rem}
+.price{align-self:flex-start;display:inline-block;margin-bottom:8px;padding:2px 9px;border-radius:999px;background:var(--tint);color:var(--accent);font-weight:700;font-size:.85rem}
+.card.featured{border-color:var(--accent);background:linear-gradient(180deg,var(--tint),var(--card) 70%)}
+.about{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px}
+.about p{margin:.4em 0;max-width:70ch}
+.follow{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.lap ul{margin:6px 0 0;padding-left:18px;color:var(--muted)}
+footer{border-top:1px solid var(--line);margin-top:20px;padding:20px 0 40px;color:var(--muted);font-size:.9rem}
+@media (max-width:800px){.hero{grid-template-columns:1fr;gap:28px}}
+@media (max-width:560px){.top nav a{margin-left:12px;font-size:.9rem}.hero{padding-top:20px}.btn{width:100%;text-align:center}}
+</style>
 </head><body>
-<h1>Torqsheet</h1>
-<p>Small Excel budgeting spreadsheets, and free notes on making a budget that survives real months.</p>
-<h2>Notes</h2>
-<ul>
-<li><a href="/three-paycheck-months-2027/">Three-paycheck months in 2027 (biweekly pay calendar)</a></li>
-<li><a href="/27-paychecks-2027/">27 paychecks in 2027? Who gets 27 biweekly (or 53 weekly) paydays</a></li>
-<li><a href="/paychecks-until-christmas-2026/">How many paychecks until Christmas 2026? (savings per paycheck)</a></li>
-<li><a href="/sinking-funds-per-paycheck-calculator/">Sinking funds calculator: what to save from each paycheck</a></li>
-<li><a href="/emergency-fund-per-paycheck-calculator/">Emergency fund calculator: what to save from each paycheck</a></li>
-<li><a href="/debt-snowball-vs-avalanche-calculator/">Debt snowball vs avalanche calculator</a></li>
-</ul>
-<h2>Lap time tools</h2>
-<ul>
-<li><a href="/lap-time-consistency-calculator/">Lap time consistency calculator (best, average, spread)</a></li>
-<li><a href="/race-fuel-calculator/">Race fuel calculator (lap or timed races, margin, stops)</a></li>
-<li><a href="https://torqsheet.gumroad.com/l/torqsheet-lap-log?utm_source=torqsheet-site">Lap and Setup Log</a> (free Excel sheet)</li>
-</ul>
-<h2>Spreadsheets</h2>
-<ul>
-<li><a href="https://torqsheet.gumroad.com/l/one-month-budget-starter?utm_source=torqsheet-site">One Month Budget Starter</a> (free)</li>
-<li><a href="https://torqsheet.gumroad.com/l/paycheck-budget-planner?utm_source=torqsheet-site">Paycheck Budget Planner</a> (USD 10.99)</li>
-<li><a href="https://torqsheet.gumroad.com/l/annual-budget-dashboard-2027?utm_source=torqsheet-site">Annual Budget Dashboard 2027</a> (USD 12.99)</li>
-<li><a href="https://torqsheet.gumroad.com/l/debt-payoff-tracker?utm_source=torqsheet-site">Debt Payoff Tracker: snowball and avalanche</a> (USD 10.99)</li>
-</ul>
-<p><small>Not financial advice. <a href="/privacy/">Privacy policy</a>.</small></p>
+<div class="wrap">
+<header class="top">
+  <a class="brand" href="/"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#1f6b4f"/><path d="M9 10h14v3h-5.5v12h-3V13H9z" fill="#fff"/></svg>Torqsheet</a>
+  <nav><a href="#calculators">Calculators</a><a href="#spreadsheets">Spreadsheets</a><a href="#about">About</a></nav>
+</header>
+
+<div class="hero">
+  <div>
+  <p class="kicker">Budgeting by payday</p>
+  <h1>Plan your money one paycheck at a time.</h1>
+  <p class="lede">Most budgets think in months. If you are paid every week or every two weeks, your bills do not line up that neatly. These free calculators work in paydays: what to set aside from each one, which months bring a third paycheck, and how fast a debt goes.</p>
+  <div class="cta">
+    <a class="btn primary" href="#calculators">Try the free calculators</a>
+    <a class="btn ghost" href="https://torqsheet.gumroad.com/l/one-month-budget-starter?utm_source=torqsheet-site&amp;utm_campaign=home">Get the free budget sheet</a>
+  </div>
+  <p class="trust">Free. No sign-up. Nothing you type leaves your browser.</p>
+  </div>
+  <div class="cal" role="img" aria-label="Paydays per month in 2027 when paid every other Friday from 1 January: three in January, July and December, two in every other month, 27 in the year.">
+    <p class="t">Paydays per month, 2027</p>
+    <p class="s">Paid every other Friday, first payday 1 January</p>
+    <div class="months"><div class="m three"><b>3</b>Jan</div><div class="m"><b>2</b>Feb</div><div class="m"><b>2</b>Mar</div><div class="m"><b>2</b>Apr</div><div class="m"><b>2</b>May</div><div class="m"><b>2</b>Jun</div><div class="m three"><b>3</b>Jul</div><div class="m"><b>2</b>Aug</div><div class="m"><b>2</b>Sep</div><div class="m"><b>2</b>Oct</div><div class="m"><b>2</b>Nov</div><div class="m three"><b>3</b>Dec</div></div>
+    <p class="foot">27 paychecks in the year. <a href="/three-paycheck-months-2027/">Check your own dates →</a></p>
+  </div>
+</div>
+</div>
+
+<div class="wrap">
+<section id="calculators">
+  <h2>Free calculators</h2>
+  <p class="sub">Each one answers a single question and runs entirely on your device.</p>
+
+  <p class="group">Save from each paycheck</p>
+  <div class="grid">
+    <a class="card" href="/sinking-funds-per-paycheck-calculator/"><h3>Sinking funds per paycheck</h3><p>List the yearly and irregular costs (insurance, gifts, car repairs) with their due dates and get what to set aside from every paycheck.</p><span class="go">Open calculator →</span></a>
+    <a class="card" href="/emergency-fund-per-paycheck-calculator/"><h3>Emergency fund per paycheck</h3><p>Months of essentials you want covered, what you have saved, and a date: get the amount per payday, or when a fixed amount gets you there.</p><span class="go">Open calculator →</span></a>
+    <a class="card" href="/paychecks-until-christmas-2026/"><h3>Paychecks until Christmas 2026</h3><p>Count the paydays left before Christmas on any pay schedule, and how much to set aside from each to reach your gift budget without debt.</p><span class="go">Open calculator →</span></a>
+  </div>
+
+  <p class="group">Know your paydays</p>
+  <div class="grid">
+    <a class="card" href="/three-paycheck-months-2027/"><h3>Three-paycheck months in 2027</h3><p>Paid every other week? A table for every possible first payday, and a checker for your own pay date.</p><span class="go">See the calendar →</span></a>
+    <a class="card" href="/27-paychecks-2027/"><h3>27 paychecks in 2027?</h3><p>2027 starts and ends on a Friday. Which schedules get 27 biweekly or 53 weekly paydays, and what that does to each paycheck.</p><span class="go">Check your schedule →</span></a>
+  </div>
+
+  <p class="group">Pay off debt</p>
+  <div class="grid">
+    <a class="card" href="/debt-snowball-vs-avalanche-calculator/"><h3>Debt snowball vs avalanche</h3><p>Enter your debts and an extra monthly payment. See months to debt-free and total interest for both methods and for minimums only, side by side.</p><span class="go">Open calculator →</span></a>
+  </div>
+</section>
+
+<section id="spreadsheets">
+  <h2>Excel spreadsheets</h2>
+  <p class="sub">When you want the whole plan in one file you keep. Excel .xlsx, no macros; the three paid sheets were tested in Google Sheets too.</p>
+  <div class="grid">
+    <a class="card featured" href="https://torqsheet.gumroad.com/l/one-month-budget-starter?utm_source=torqsheet-site&amp;utm_campaign=home"><span class="price">Free</span><h3>One Month Budget Starter</h3><p>One month of transactions, 40 categories with your own budgets, and a month view of budget against actual. Nothing expires.</p><span class="go">Download on Gumroad →</span></a>
+    <a class="card" href="https://torqsheet.gumroad.com/l/paycheck-budget-planner?utm_source=torqsheet-site&amp;utm_campaign=home"><span class="price">USD 10.99</span><h3>Paycheck Budget Planner</h3><p>Every pay period on its own: each bill lands in the paycheck it falls in, sinking funds come off each payday, and a tight period turns amber or red.</p><span class="go">See it on Gumroad →</span></a>
+    <a class="card" href="https://torqsheet.gumroad.com/l/annual-budget-dashboard-2027?utm_source=torqsheet-site&amp;utm_campaign=home"><span class="price">USD 12.99</span><h3>Annual Budget Dashboard 2027</h3><p>One transaction list for the whole year. Categories decide income or expense, and a month view and full-year dashboard show your savings rate.</p><span class="go">See it on Gumroad →</span></a>
+    <a class="card" href="https://torqsheet.gumroad.com/l/debt-payoff-tracker?utm_source=torqsheet-site&amp;utm_campaign=home"><span class="price">USD 10.99</span><h3>Debt Payoff Tracker</h3><p>Snowball, avalanche or your own order, with each cleared minimum rolling onto the next debt. Debt-free date, interest, and the saving against minimums only.</p><span class="go">See it on Gumroad →</span></a>
+  </div>
+</section>
+
+<section id="about">
+  <div class="about">
+    <h2>How this is made</h2>
+    <p>Torqsheet is run by an AI operator working for one person, who owns it. The pages and spreadsheets are written with AI assistance.</p>
+    <p>No cookies, no analytics, no accounts. The calculators run in your browser. These are arithmetic tools, not financial advice: the decisions stay yours.</p>
+    <div class="follow">
+      <a class="btn ghost" href="https://www.youtube.com/channel/UCIuXYm9R2wzNvIWVdAfzOWg">Short explainers on YouTube</a>
+      <a class="btn ghost" href="https://bsky.app/profile/torqy.bsky.social">Follow on Bluesky</a>
+    </div>
+  </div>
+</section>
+
+<section class="lap">
+  <p class="group">Also here: tools for sim racers</p>
+  <ul>
+    <li><a href="/lap-time-consistency-calculator/">Lap time consistency calculator</a> (best, average, spread)</li>
+    <li><a href="/race-fuel-calculator/">Race fuel calculator</a> (lap or timed races, margin, stops)</li>
+    <li><a href="https://torqsheet.gumroad.com/l/torqsheet-lap-log?utm_source=torqsheet-site&amp;utm_campaign=home">Lap and Setup Log</a> (free Excel sheet)</li>
+  </ul>
+</section>
+
+<footer>Torqsheet · Not financial advice · <a href="/privacy/">Privacy policy</a></footer>
+</div>
 </body></html>
