@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home maintenance fund calculator: how much to save per paycheck for repairs</title>
+<meta name="description" content="How much to set aside for home repairs and maintenance from each paycheck: start from the 1% of home value rule of thumb or from what your repairs actually cost, pick how often you are paid, and get the amount per payday and a cap for the fund. Free, runs in your browser.">
+<link rel="canonical" href="https://torqsheeet.github.io/home-maintenance-fund-per-paycheck-calculator/">
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:760px;margin:0 auto;padding:24px 18px 60px;line-height:1.55;color:#1d2a26;background:#fbfaf6}
+h1{font-size:1.8rem;line-height:1.2;margin:.2em 0 .4em} h2{font-size:1.25rem;margin-top:2em}
+table{border-collapse:collapse;width:100%;margin:1em 0} th,td{border-bottom:1px solid #d9d6cc;padding:7px 8px;text-align:left} th{background:#e8efe9}
+.box{background:#fff;border:1px solid #d9d6cc;border-radius:8px;padding:16px;margin:1.2em 0}
+.box label{display:block;margin:8px 0 2px}
+input,select,button{font-size:1rem;padding:6px 10px} button{margin-top:12px} #out{margin-top:12px}
+small,.note{color:#5b6660} a{color:#1f6b4f}
+</style>
+</head>
+<body>
+<p class="note"><a href="/">Torqsheet</a> &middot; budgeting notes</p>
+<h1>Home maintenance fund calculator: what to save from each paycheck</h1>
+<p>Home repairs have no due date: the roof, the water heater, the fence, the dishwasher all fail
+when they fail. That makes them hard to budget for, so give the fund a <strong>yearly target</strong>
+instead of a deadline. A common rule of thumb is about <strong>1% of the home's value a year</strong>
+(more for an older home or one in a harsh climate). If you have a few years of your own repair
+bills, their average is a better starting point. This calculator turns either into an amount per
+paycheck, and suggests a cap so the fund does not grow forever.</p>
+
+<div class="box">
+<label for="basis">Start from:</label>
+<select id="basis">
+<option value="pct" selected>A share of the home's value</option>
+<option value="avg">What my repairs actually cost (average of past years)</option>
+</select>
+<div id="pctBox">
+<label for="val">Home value (what it would sell for):</label>
+<input type="number" id="val" min="0" step="1000" value="300000">
+<label for="pct">Share per year:</label>
+<select id="pct">
+<option value="1" selected>1% (common rule of thumb)</option>
+<option value="1.5">1.5% (older home)</option>
+<option value="2">2% (old home, harsh climate)</option>
+<option value="0.5">0.5% (new build, still under warranty)</option>
+</select>
+</div>
+<div id="avgBox" style="display:none">
+<label for="yrs">Repair costs in past years, separated by commas:</label>
+<input type="text" id="yrs" value="1800, 4200, 2600" style="width:100%;box-sizing:border-box">
+</div>
+<label for="freq">How often you are paid:</label>
+<select id="freq">
+<option value="52">Weekly (52 a year)</option>
+<option value="26" selected>Every two weeks (26 a year)</option>
+<option value="24">Twice a month (24 a year)</option>
+<option value="12">Monthly (12 a year)</option>
+</select>
+<label for="have">Already set aside for repairs:</label>
+<input type="number" id="have" min="0" step="100" value="0">
+<br><button id="go" type="button">Work it out</button>
+<div id="out"></div>
+<small>Runs in your browser; nothing is sent anywhere. These are planning estimates, not a quote:
+a single repair (a roof, a foundation) can cost several years of the fund.</small>
+</div>
+
+<h2>How the numbers work</h2>
+<p>Yearly target: home value times the share you picked, or the average of the repair bills you
+entered. Per paycheck: the yearly target divided by your paydays a year (52 weekly, 26 biweekly,
+24 twice a month, 12 monthly). Example: a $300,000 home at 1% is $3,000 a year, which is
+<strong>$115.38 a biweekly paycheck</strong> or $250 a month.</p>
+<p>The suggested cap is one year's target or your worst single year, whichever is larger. Once the
+fund reaches it, stop adding and send that money elsewhere; after a repair, refill it at the same
+rate. A year with several big repairs at once is what an
+<a href="/emergency-fund-per-paycheck-calculator/">emergency fund</a> is for.</p>
+
+<h2>Other costs that work the same way</h2>
+<ul>
+<li>Car repairs and tyres: average your last few years, cap at your worst year.</li>
+<li>Vet bills, dental work, glasses.</li>
+<li>Replacing a phone or laptop every few years: its price divided by the years it lasts.</li>
+</ul>
+<p>Costs with a known due date (insurance renewals, registration, Christmas) are easier: count the
+paydays to the date with the <a href="/sinking-funds-per-paycheck-calculator/">sinking funds calculator</a>.</p>
+<p>This is general budgeting information, not financial advice.</p>
+
+<h2>Spreadsheets</h2>
+<p>To plan a single month as budget against actual, there is a free Excel sheet:
+<a href="https://torqsheet.gumroad.com/l/one-month-budget-starter?utm_source=torqsheet-site&amp;utm_campaign=home-maintenance-fund">One Month Budget Starter</a>
+(EUR 0, .xlsx, no macros). If you want to budget pay period by pay period, Torqsheet also sells a
+<a href="https://torqsheet.gumroad.com/l/paycheck-budget-planner?utm_source=torqsheet-site&amp;utm_campaign=home-maintenance-fund">Paycheck Budget Planner</a>
+(USD 10.99, Excel). Disclosure: Torqsheet makes and sells these; this page is free either way.</p>
+
+<p class="note">Spotted a mistake? Open an issue on
+<a href="https://github.com/torqsheeet/torqsheeet.github.io/issues">GitHub</a>.</p>
+
+<script>
+function money(x) { return x.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+function whole(x) { return x.toLocaleString(undefined, {maximumFractionDigits: 0}); }
+var basis = document.getElementById('basis');
+basis.onchange = function () {
+  document.getElementById('pctBox').style.display = basis.value === 'pct' ? '' : 'none';
+  document.getElementById('avgBox').style.display = basis.value === 'avg' ? '' : 'none';
+};
+function plan(b, val, pct, yrs, freq, have) {
+  var yearly, worst = 0;
+  if (b === 'pct') {
+    if (!(val > 0)) return {err: 'Enter the home value.'};
+    yearly = val * pct / 100;
+  } else {
+    var xs = yrs.split(/,(?!\d{3}(?!\d))|[;\s]+/).map(function (s) { return parseFloat(s.replace(/[^0-9.]/g, '')); }).filter(function (x) { return x >= 0; });
+    if (!xs.length) return {err: 'Enter at least one year of repair costs.'};
+    yearly = xs.reduce(function (a, x) { return a + x; }, 0) / xs.length;
+    worst = Math.max.apply(null, xs);
+  }
+  var cap = Math.max(yearly, worst), per = yearly / freq, left = Math.max(cap - have, 0);
+  return {yearly: yearly, per: per, month: yearly / 12, cap: cap, paydays: per > 0 ? Math.ceil(left / per) : 0, left: left};
+}
+document.getElementById('go').onclick = function () {
+  var out = document.getElementById('out');
+  var freq = +document.getElementById('freq').value;
+  var r = plan(basis.value, parseFloat(document.getElementById('val').value), parseFloat(document.getElementById('pct').value),
+    document.getElementById('yrs').value, freq, parseFloat(document.getElementById('have').value) || 0);
+  if (r.err) { out.textContent = r.err; return; }
+  var h = '<p>Yearly target: <strong>' + money(r.yearly) + '</strong> (' + money(r.month) + ' a month).</p>' +
+    '<p>Set aside <strong>' + money(r.per) + '</strong> from each paycheck (' + freq + ' a year).</p>' +
+    '<p>Suggested cap: ' + money(r.cap) + '. ';
+  h += r.left > 0 ? 'At this rate you reach it in ' + whole(r.paydays) + ' paydays.</p>' : 'You are already there: stop adding and refill after each repair.</p>';
+  out.innerHTML = h;
+};
+document.getElementById('go').click();
+</script>
+</body>
+</html>
