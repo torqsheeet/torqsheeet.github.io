@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>50/30/20 budget calculator per paycheck: needs, wants and savings from each payday</title>
+<meta name="description" content="Split each paycheck with the 50/30/20 rule (or 60/20/20, 70/20/10): enter your take-home pay and how often you are paid, and get needs, wants and savings per paycheck, per month and per year, plus how your real needs compare. Free, runs in your browser.">
+<link rel="canonical" href="https://torqsheeet.github.io/50-30-20-budget-per-paycheck-calculator/">
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:760px;margin:0 auto;padding:24px 18px 60px;line-height:1.55;color:#1d2a26;background:#fbfaf6}
+h1{font-size:1.8rem;line-height:1.2;margin:.2em 0 .4em} h2{font-size:1.25rem;margin-top:2em}
+table{border-collapse:collapse;width:100%;margin:1em 0} th,td{border-bottom:1px solid #d9d6cc;padding:7px 8px;text-align:left} th{background:#e8efe9}
+td.n,th.n{text-align:right}
+.box{background:#fff;border:1px solid #d9d6cc;border-radius:8px;padding:16px;margin:1.2em 0}
+.box label{display:block;margin:8px 0 2px}
+input,select,button{font-size:1rem;padding:6px 10px} button{margin-top:12px} #out{margin-top:12px}
+small,.note{color:#5b6660} a{color:#1f6b4f}
+</style>
+</head>
+<body>
+<p class="note"><a href="/">Torqsheet</a> &middot; budgeting notes</p>
+<h1>50/30/20 budget calculator: split each paycheck</h1>
+<p>The 50/30/20 rule splits your <strong>take-home pay</strong> (after tax and deductions) three
+ways: about <strong>50% for needs</strong> (rent or mortgage, utilities, groceries, insurance,
+transport to work, minimum debt payments), <strong>30% for wants</strong> (eating out, streaming,
+hobbies, trips) and <strong>20% for savings and extra debt payments</strong>. Most budgets explain
+it per month, but you are paid per paycheck, so this calculator does the split per payday as well.</p>
+
+<div class="box">
+<label for="pay">Take-home pay per paycheck:</label>
+<input type="number" id="pay" min="0" step="50" value="2000">
+<label for="freq">How often you are paid:</label>
+<select id="freq">
+<option value="52">Weekly (52 a year)</option>
+<option value="26" selected>Every two weeks (26 a year)</option>
+<option value="24">Twice a month (24 a year)</option>
+<option value="12">Monthly (12 a year)</option>
+</select>
+<label for="split">Split (needs / wants / savings):</label>
+<select id="split">
+<option value="50,30,20" selected>50 / 30 / 20 (the usual rule)</option>
+<option value="60,20,20">60 / 20 / 20 (high-rent area)</option>
+<option value="70,20,10">70 / 20 / 10 (tight budget)</option>
+<option value="50,20,30">50 / 20 / 30 (paying off debt or saving hard)</option>
+</select>
+<label for="needs">Optional: what your needs actually cost per month:</label>
+<input type="number" id="needs" min="0" step="50" placeholder="e.g. 2400">
+<br><button id="go" type="button">Split it</button>
+<div id="out"></div>
+<small>Runs in your browser; nothing is sent anywhere. The split is a starting point, not a test
+you pass or fail: what matters is that something goes to savings every payday.</small>
+</div>
+
+<h2>How the numbers work</h2>
+<p>Per paycheck: take-home pay times each share. Per month: the per-paycheck amount times your
+paydays a year, divided by 12 (52 weekly, 26 biweekly, 24 twice a month, 12 monthly). Example:
+$2,000 take-home every two weeks is $52,000 a year, or $4,333.33 a month. At 50/30/20 that is
+<strong>$1,000 for needs, $600 for wants and $400 for savings from each paycheck</strong>, or
+$2,166.67, $1,300 and $866.67 a month.</p>
+<p>If you are paid every two weeks, most months have two paydays and two months a year have three.
+Budget your monthly bills on two paychecks, and the third paycheck in those months is free to go
+to savings or debt; see the <a href="/three-paycheck-months-2027/">three-paycheck months in 2027</a>.</p>
+<p>If your real needs come to more than half of your take-home pay, that is common where rent is
+high. Try 60/20/20 and keep the 20% savings, rather than cutting savings first.</p>
+
+<h2>Where the 20% can go</h2>
+<ul>
+<li>A starter <a href="/emergency-fund-per-paycheck-calculator/">emergency fund</a>, first.</li>
+<li>Bills that come once a year (insurance, registration, Christmas): a
+<a href="/sinking-funds-per-paycheck-calculator/">sinking fund per paycheck</a>.</li>
+<li>Debt above the minimum payment: compare
+<a href="/debt-snowball-vs-avalanche-calculator/">snowball and avalanche</a>.</li>
+</ul>
+<p>This is general budgeting information, not financial advice.</p>
+
+<h2>Spreadsheets</h2>
+<p>To plan a single month as budget against actual, there is a free Excel sheet:
+<a href="https://torqsheet.gumroad.com/l/one-month-budget-starter?utm_source=torqsheet-site&amp;utm_campaign=50-30-20">One Month Budget Starter</a>
+(EUR 0, .xlsx, no macros). If you want to budget pay period by pay period, Torqsheet also sells a
+<a href="https://torqsheet.gumroad.com/l/paycheck-budget-planner?utm_source=torqsheet-site&amp;utm_campaign=50-30-20">Paycheck Budget Planner</a>
+(USD 10.99, Excel). Disclosure: Torqsheet makes and sells these; this page is free either way.</p>
+
+<p class="note">Spotted a mistake? Open an issue on
+<a href="https://github.com/torqsheeet/torqsheeet.github.io/issues">GitHub</a>.</p>
+
+<script>
+function money(x) { return x.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+function split(pay, freq, shares, needs) {
+  if (!(pay > 0)) return {err: 'Enter your take-home pay per paycheck.'};
+  var month = pay * freq / 12, names = ['Needs', 'Wants', 'Savings and extra debt'];
+  var rows = shares.map(function (s, i) { return {name: names[i], pct: s, per: pay * s / 100, month: month * s / 100, year: pay * freq * s / 100}; });
+  var r = {month: month, year: pay * freq, rows: rows};
+  if (needs > 0) r.needsPct = needs / month * 100;
+  return r;
+}
+document.getElementById('go').onclick = function () {
+  var out = document.getElementById('out');
+  var freq = +document.getElementById('freq').value;
+  var shares = document.getElementById('split').value.split(',').map(Number);
+  var r = split(parseFloat(document.getElementById('pay').value), freq, shares, parseFloat(document.getElementById('needs').value));
+  if (r.err) { out.textContent = r.err; return; }
+  var h = '<p>Take-home: ' + money(r.month) + ' a month, ' + money(r.year) + ' a year (' + freq + ' paychecks).</p>' +
+    '<table><tr><th>Part</th><th class="n">Per paycheck</th><th class="n">Per month</th><th class="n">Per year</th></tr>';
+  r.rows.forEach(function (x) {
+    h += '<tr><td>' + x.name + ' (' + x.pct + '%)</td><td class="n"><strong>' + money(x.per) + '</strong></td><td class="n">' + money(x.month) + '</td><td class="n">' + money(x.year) + '</td></tr>';
+  });
+  h += '</table>';
+  if (r.needsPct !== undefined) {
+    h += '<p>Your needs are <strong>' + r.needsPct.toFixed(0) + '%</strong> of your take-home pay' +
+      (r.needsPct > r.rows[0].pct ? ', above the ' + r.rows[0].pct + '% in this split. Take the difference from wants before savings.' : ', within the ' + r.rows[0].pct + '% in this split.') + '</p>';
+  }
+  out.innerHTML = h;
+};
+document.getElementById('go').click();
+</script>
+</body>
+</html>
